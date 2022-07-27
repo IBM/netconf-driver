@@ -1,4 +1,5 @@
-from ignition.model.lifecycle import LifecycleExecuteResponse, LifecycleExecution, STATUS_COMPLETE
+from ignition.model.failure import FAILURE_CODE_INTERNAL_ERROR, FailureDetails
+from ignition.model.lifecycle import STATUS_FAILED, LifecycleExecution, STATUS_COMPLETE
 from ignition.service.framework import Service
 from ignition.service.resourcedriver import ResourceDriverHandlerCapability, ResourceDriverError, InvalidRequestError
 from ignition.service.framework import Service
@@ -58,12 +59,15 @@ class ResourceDriverHandler(Service, ResourceDriverHandlerCapability):
             edit_config_details = netconf_location.operation(package_properties,default_operation,rsa_key_path)
             logger.info('RESPONSE: %s :- After Executing Operation , Result : %s', request_id, edit_config_details)
         except NetconfConfigError as e:
-            raise InvalidRequestError(str(e)) from e
+            failure_reason = f'Error related to Netconf Connection or Configuration. {e}'
+            return LifecycleExecution(request_id, STATUS_FAILED, FailureDetails(FAILURE_CODE_INTERNAL_ERROR, failure_reason), outputs={})
         except jinja_conversion.PropertyError as e:
-            raise ResourceDriverError(str(e)) from e
+            failure_reason = f'Error related to jinja_conversion. {e}'
+            return LifecycleExecution(request_id, STATUS_FAILED, FailureDetails(FAILURE_CODE_INTERNAL_ERROR, failure_reason), outputs={})
         else:
             os.unlink(rsa_key_path)
-            return LifecycleExecuteResponse(request_id)
+            logger.info("Lifecycle Execution is successful.")
+            return LifecycleExecution(request_id, STATUS_COMPLETE, failure_details=None, outputs={})
 
     def get_lifecycle_execution(self, request_id, deployment_location):
         """
@@ -76,8 +80,6 @@ class ResourceDriverHandler(Service, ResourceDriverHandlerCapability):
             ignition.service.resourcedriver.TemporaryResourceDriverError: there is an issue handling this request at this time, an attempt should be made again at a later time
             ignition.service.resourcedriver.ResourceDriverError: there was an error handling this request
         """
-
-        return LifecycleExecution(request_id, STATUS_COMPLETE, failure_details=None, outputs={})
 
     def find_reference(self, instance_name, driver_files, deployment_location):
         """

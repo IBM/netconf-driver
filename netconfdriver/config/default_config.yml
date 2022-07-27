@@ -4,3 +4,6 @@ application:
 
 messaging:
   connection_address: cp4na-o-events-kafka-bootstrap:9092
+
+resource_driver:
+  async_messaging_enabled: False
