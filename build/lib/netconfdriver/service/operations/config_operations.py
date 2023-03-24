@@ -51,6 +51,7 @@ class ConfigOperations():
             logger.error('Unexpected exception {0}'.format(e))
             raise NetconfConfigError(str(e)) from e
 
+
     def _generate_additional_logs(message_data, message_direction, external_request_id,content_type,
                                   message_type, protocol, protocol_metadata, driver_request_id):
         try: 
@@ -74,3 +75,4 @@ class ConfigOperations():
                 logging_context.data.pop("tracectx.driverrequestid")
 
                 
+
