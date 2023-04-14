@@ -10,7 +10,7 @@ class NetconfConfigError(Exception):
 
 class ConfigOperations():
     def netconf_connect(host, port, user, password,rsa_key_path,kwargs):
-        logger.debug(f'host:{host},port:{port},user:{user},password:{password},rsa_key_path:{rsa_key_path},kwargs:{kwargs}')
+        logger.debug(f'host:{host},port:{port},user:{user},password:********,rsa_key_path:{rsa_key_path},kwargs:{kwargs}')
         try:
             for key in kwargs:
                 key = kwargs[key]

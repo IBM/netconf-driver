@@ -35,8 +35,6 @@ class ResourceDriverHandler(Service, ResourceDriverHandlerCapability):
         netconf_location = None
         
         try:
-            logger.info(f'lifecycle_name:{lifecycle_name},driver_files:{driver_files},deployment_location:{deployment_location}')
-            logger.info(f'resource_properties:{resource_properties},request_properties:{request_properties},associated_topology: {associated_topology}')
             netconf_location = NetConfDeploymentLocation.from_dict(deployment_location)
             method_name = lifecycle_name.lower()
             if(method_name == 'upgrade'):
@@ -44,7 +42,6 @@ class ResourceDriverHandler(Service, ResourceDriverHandlerCapability):
             package_properties = jinja_conversion.from_pkg(resource_properties, driver_files, method_name)
             if package_properties is None:
                 raise ResourceDriverError('Templating Exception')
-            logger.info('package_properties : %s', package_properties)
             default_operation = jinja_conversion.to_string(resource_properties)
             if method_name == 'delete' and default_operation == 'replace':
                 default_operation = 'none'
