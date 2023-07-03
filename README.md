@@ -24,7 +24,7 @@ Netconf driver implements following lifecycle methods to operate network configu
 	
 ## Configuration
 
--  Configuration details for the Create/Update/Delete lifecycle methods are passed through xml template files 
+-  Configuration details for the Create/Upgrade/Delete lifecycle methods are passed through xml template files 
 	as part of the resource package as follows.
 
 	  1. For Create lifecycle, create.xml  
