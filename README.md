@@ -57,10 +57,11 @@ For example:
 			"target": "running"
 	}
 ```
-- `candidate` or `startup` can be specified as target datastore type.
-
-- if none is specified, by default it uses `running` datastore type.
-
+```
+Note: 
+   1. candidate or startup can be specified as target datastore type.
+   2. if none is specified, by default it uses running datastore type.
+```
 - For ssh communication with the network device, the ssh keys must be added to Brent using Infrastructure Keys: https://www.ibm.com/docs/en/cloud-paks/cp-network-auto/2.2.x?topic=using-infrastructure-keys
 
 - In the resource package, in the resource.yaml file , make sure to add a property 'infraKey' with type as 'key' and push the resource package to cp4na. Example shown below : 
