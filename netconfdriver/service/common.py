@@ -31,3 +31,7 @@ def build_request_id(method_name):
         request_id += REQUEST_ID_SEPARATOR
         request_id += str(uuid.uuid4())
         return request_id
+    
+DATASTORE_RUNNING = 'running'
+DATASTORE_CANDIDATE = 'candidate'
+DATASTORE_STARTUP = 'startup'    

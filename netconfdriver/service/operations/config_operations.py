@@ -27,12 +27,12 @@ class ConfigOperations():
             logger.error('Unexpected exception {0}'.format(e))
             raise NetconfConfigError(str(e)) from e
         
-    def netconf_edit(conn,package_properties,default_operation,request_id):
+    def netconf_edit(conn,package_properties,default_operation,target_datastore,request_id):
         try:
             external_request_id = str(uuid.uuid4())
             ConfigOperations._generate_additional_logs(package_properties, 'sent', external_request_id, 'application/xml',
-                                       'request', 'netconf', {'default-operation' : default_operation}, request_id)
-            edit_config_details = conn.edit_config(config=package_properties, target="running", default_operation=default_operation)
+                                       'request', 'netconf', {'default-operation' : default_operation, 'target': target_datastore}, request_id)
+            edit_config_details = conn.edit_config(config=package_properties, target=target_datastore, default_operation=default_operation)
             response_err = ''
             if edit_config_details.error != None:
                 response_err = edit_config_details.error          
@@ -61,6 +61,30 @@ class ConfigOperations():
             logger.error('Unexpected exception {0}'.format(e))
             raise NetconfConfigError(str(e)) from e
         
+    def netconf_lock(conn):
+        try:
+            logger.debug('Applied lock before updating the configurations ...')
+            conn.lock()
+        except Exception as e:
+            logger.error('Unexpected exception {0}'.format(e))
+            raise NetconfConfigError(str(e)) from e   
+             
+    def netconf_unlock(conn):
+        try:
+            logger.debug('Unlocking the configurations after the commit ...')
+            conn.unlock()
+        except Exception as e:
+            logger.error('Unexpected exception {0}'.format(e))
+            raise NetconfConfigError(str(e)) from e
+                
+    def netconf_commit(conn):
+        try:
+            logger.debug('Committing the configurations ...')
+            conn.commit()
+        except Exception as e:
+            logger.error('Unexpected exception {0}'.format(e))
+            raise NetconfConfigError(str(e)) from e
+                
     def netconf_disconnect(conn):
         try:
             logger.debug('Close session...')

@@ -6,7 +6,7 @@ CP4NA supports integration of netconf devices using Netconf-Driver.
 Netconf driver implements following lifecycle methods to operate network configurations of a network device.
 
 	1. Create
-	2. Update
+	2. Upgrade
 	3. Delete
 
 -  It uses Ignition framework (https://github.com/IBM/ignition) to communicate 
@@ -20,7 +20,7 @@ Netconf driver implements following lifecycle methods to operate network configu
 	with default-operation as one of ‘merge’, ‘replace’ or ‘none’.
 
 -  Resource properties can pass the default-operation property value as ‘merge’ or ‘replace’ 
-      for Create and Update lifecycles. For Delete lifecycle 'none' is used by default.
+      for Create and Upgrade lifecycles. For Delete lifecycle 'none' is used by default.
 	
 ## Configuration
 
@@ -28,7 +28,7 @@ Netconf driver implements following lifecycle methods to operate network configu
 	as part of the resource package as follows.
 
 	  1. For Create lifecycle, create.xml  
-	  2. For Update lifecycle, update.xml
+	  2. For Upgrade lifecycle, update.xml
 	  3. For Delete lifecycle, delete.xml
 
 -  For each lifecycle, configurations are generated in the driver by parsing the properties in the corresponding 
@@ -53,9 +53,13 @@ For example:
 			"port": "830",
 			"username": "netconf",
 			"password": "netconf",
-			"timeout": 30
+			"timeout": 30,
+			"target": "running"
 	}
 ```
+- `candidate` or `startup` can be specified as target datastore type.
+
+- if none is specified, by default it uses `running` datastore type.
 
 - For ssh communication with the network device, the ssh keys must be added to Brent using Infrastructure Keys: https://www.ibm.com/docs/en/cloud-paks/cp-network-auto/2.2.x?topic=using-infrastructure-keys
 

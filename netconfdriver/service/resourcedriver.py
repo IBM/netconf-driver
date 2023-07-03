@@ -43,7 +43,7 @@ class ResourceDriverHandler(Service, ResourceDriverHandlerCapability):
             if package_properties is None:
                 raise ResourceDriverError('Templating Exception')
             default_operation = jinja_conversion.to_string(resource_properties)
-            if method_name == 'delete' and default_operation == 'replace':
+            if method_name == 'delete':
                 default_operation = 'none'
             if default_operation is None:
                 raise ResourceDriverError('Default operation Exception')
