@@ -48,19 +48,19 @@ For example:
 - Following deployment location properties will have the values for connecting to the Netconf server:
 
 ```
-	{
-			"host": "9.30.XX.XX",
-			"port": "830",
-			"username": "netconf",
-			"password": "netconf",
-			"timeout": 30,
-			"target": "running"
-	}
+{
+	"host": "9.30.XX.XX",
+	"port": "830",
+	"username": "netconf",
+	"password": "netconf",
+	"timeout": 30,
+	"target": "running"
+}
 ```
 ```
 Note: 
-   1. candidate or startup can be specified as target datastore type.
-   2. if none is specified, by default it uses running datastore type.
+   1. candidate or startup datastore type can be specified as target in the deployment location
+   2. By default target uses running datastore type, if no value specified or any other value specified
 ```
 - For ssh communication with the network device, the ssh keys must be added to Brent using Infrastructure Keys: https://www.ibm.com/docs/en/cloud-paks/cp-network-auto/2.2.x?topic=using-infrastructure-keys
 
