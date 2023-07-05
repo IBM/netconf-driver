@@ -43,7 +43,7 @@ def process_list_maps(value):
             value = {k:v for element in value for k,v in element.items()}
             return value
 
-def to_string(resource_properties):
+def get_default_operation(resource_properties):
     try:
         value = None
         default = DEFAULT_OPERATION

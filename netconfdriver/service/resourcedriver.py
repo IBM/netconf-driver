@@ -42,15 +42,15 @@ class ResourceDriverHandler(Service, ResourceDriverHandlerCapability):
             package_properties = jinja_conversion.from_pkg(resource_properties, driver_files, method_name)
             if package_properties is None:
                 raise ResourceDriverError('Templating Exception')
-            default_operation = jinja_conversion.to_string(resource_properties)
+            default_operation = jinja_conversion.get_default_operation(resource_properties)
             if method_name == 'delete':
                 default_operation = 'none'
             if default_operation is None:
-                raise ResourceDriverError('Default operation Exception')
+                default_operation = 'merge'
             rsa_key_path = jinja_conversion.to_rsa_path(resource_properties)
             logger.debug('rsa_key_path : %s', rsa_key_path)
             if rsa_key_path is None:
-                raise ResourceDriverError('RSA private key Exception')
+                logger.warn("rsa_key_path is None!")
             request_id = common.build_request_id(method_name)
             logger.info('REQUEST: %s :- Before Executing Operation', request_id)
             edit_config_details = netconf_location.operation(package_properties,default_operation,rsa_key_path,request_id)
