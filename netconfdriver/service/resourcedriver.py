@@ -64,7 +64,6 @@ class ResourceDriverHandler(Service, ResourceDriverHandlerCapability):
         else:
             if (rsa_key_path != None):
                 os.unlink(rsa_key_path)
-            os.unlink(rsa_key_path)
             logger.info("Lifecycle Execution is successful.")
             return LifecycleExecution(request_id, STATUS_COMPLETE, failure_details=None, outputs={})
 
