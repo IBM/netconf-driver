@@ -62,6 +62,8 @@ class ResourceDriverHandler(Service, ResourceDriverHandlerCapability):
             failure_reason = f'Error related to jinja_conversion. {e}'
             return LifecycleExecution(request_id, STATUS_FAILED, FailureDetails(FAILURE_CODE_INTERNAL_ERROR, failure_reason), outputs={})
         else:
+            if (rsa_key_path != None):
+                os.unlink(rsa_key_path)
             os.unlink(rsa_key_path)
             logger.info("Lifecycle Execution is successful.")
             return LifecycleExecution(request_id, STATUS_COMPLETE, failure_details=None, outputs={})
