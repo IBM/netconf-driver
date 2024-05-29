@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.4.1](https://github.com/IBM/netconf-driver/tree/0.4.1) (2024-05-29)
+[Full Changelog](https://github.com/IBM/netconf-driver/compare/0.4.0...0.4.1)
+
+- Update ignition version to 3.6.1 [\#97](https://github.com/IBM/netconf-driver/issues/97)
+- Security vulnerability CVE-2024-1135 [\#95](https://github.com/IBM/netconf-driver/issues/95)
+
 ## [0.4.0](https://github.com/IBM/netconf-driver/tree/0.4.0) (2024-04-18)
 [Full Changelog](https://github.com/IBM/netconf-driver/compare/0.3.2...0.4.0)
 

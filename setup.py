@@ -16,7 +16,7 @@ setup(
     packages=find_namespace_packages(include=['netconfdriver*','ncclient*']),
     include_package_data=True,
     install_requires=[
-        'gunicorn==21.2.0',
+        'gunicorn==22.0.0',
         'uvicorn==0.29.0',
         'lxml==4.9.1',
         'paramiko==3.4.0',
