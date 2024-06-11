@@ -1,5 +1,7 @@
 FROM python:3.10-alpine
 
+RUN pip install --no-cache-dir --upgrade pip
+
 ARG DRIVER_PORT
 ENV DRIVER_PORT ${DRIVER_PORT:-7139}
 ARG NUM_PROCESSES
