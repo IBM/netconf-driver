@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.4.2](https://github.com/IBM/netconf-driver/tree/0.4.2) (2024-06-18)
+[Full Changelog](https://github.com/IBM/netconf-driver/compare/0.4.1...0.4.2)
+
+- Update ignition version to 3.6.2 to fix for CP4NA UI driver log messages issue with ansible-lifecycle-driver
+- NetConf driver fails cleaning up connection if only password is used
+
 ## [0.4.1](https://github.com/IBM/netconf-driver/tree/0.4.1) (2024-05-29)
 [Full Changelog](https://github.com/IBM/netconf-driver/compare/0.4.0...0.4.1)
 
