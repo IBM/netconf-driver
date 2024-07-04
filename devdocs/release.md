@@ -82,7 +82,7 @@ Complete the following steps to ensure development can continue as normal:
 
 Complete steps 1-4 from the main release instructions (found above).
  
-## 5. Build and Release (on master)
+## 5. Build and Release (on main)
 
 The `build.py` script automates the following steps: 
 
