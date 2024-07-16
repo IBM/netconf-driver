@@ -1,5 +1,5 @@
 from ignition.model.failure import FAILURE_CODE_INTERNAL_ERROR, FailureDetails
-from ignition.model.lifecycle import STATUS_FAILED, LifecycleExecution, STATUS_COMPLETE
+from ignition.model.lifecycle import STATUS_FAILED, LifecycleExecution, STATUS_COMPLETE, STATUS_IN_PROGRESS ,LifecycleExecuteResponse 
 from ignition.service.framework import Service
 from ignition.service.resourcedriver import ResourceDriverHandlerCapability, ResourceDriverError, InvalidRequestError
 from ignition.service.framework import Service
@@ -8,10 +8,60 @@ from netconfdriver.service import jinja_conversion
 import netconfdriver.service.common as common
 from netconfdriver.service.operations.config_operations import *
 import os
+import ignition.model.lifecycle as lifecycle_model
+from ignition.service.queue import JobQueueCapability
+
 
 logger = logging.getLogger(__name__)
 
 class ResourceDriverHandler(Service, ResourceDriverHandlerCapability):
+    
+    def __init__(self, job_queue, lifecycle_messaging_service):
+        self.job_queue = job_queue
+        self.job_queue.register_job_handler('NetconfJob', self.netconfjob_handler)
+        self.lifecycle_messaging_service = lifecycle_messaging_service
+        
+    
+    def netconfjob_handler(self, job ):
+        netconf_location = None
+        netconf_location = NetConfDeploymentLocation.from_dict(job['deployment_location'])
+        request_id = job['request_id']
+        package_properties = job['package_properties']
+        default_operation = job['default_operation']
+        rsa_key_path = job['rsa_key_path']
+
+        try:
+            logger.info('REQUEST: %s :- Before Executing Operation', job['request_id'])
+            edit_config_details = netconf_location.operation(package_properties, default_operation, rsa_key_path, request_id)
+            logger.info('RESPONSE: %s :- After Executing Operation , Result : %s', request_id, edit_config_details)
+        except NetconfConfigError as e:
+            failure_reason = f'Error related to Netconf Connection or Configuration. {e}'
+            failure_details = FailureDetails(FAILURE_CODE_INTERNAL_ERROR, failure_reason)
+            status = STATUS_FAILED
+            logger.error('Error: %s', failure_details )
+            lifecycle_execution_task = LifecycleExecution(request_id, status, failure_details, outputs={})
+            self.lifecycle_messaging_service.send_lifecycle_execution(lifecycle_execution_task)
+            return True
+            
+        except jinja_conversion.PropertyError as e:
+            failure_reason = f'Error related to jinja_conversion. {e}'
+            failure_details = FailureDetails(FAILURE_CODE_INTERNAL_ERROR, failure_reason)
+            status = STATUS_FAILED
+            logger.error('Error: %s',failure_details )
+            lifecycle_execution_task = LifecycleExecution(request_id, status, failure_details, outputs={})
+            self.lifecycle_messaging_service.send_lifecycle_execution(lifecycle_execution_task)
+            return True
+           
+        else:
+            if (rsa_key_path != None):
+                os.unlink(rsa_key_path)
+            logger.info("Lifecycle Execution is successful.")
+            failure_details = None
+            status = STATUS_COMPLETE
+            lifecycle_execution_task = LifecycleExecution(request_id, status, None, outputs={} )
+            self.lifecycle_messaging_service.send_lifecycle_execution(lifecycle_execution_task)
+            return True
+
 
     def execute_lifecycle(self, lifecycle_name, driver_files, system_properties, resource_properties, request_properties, associated_topology, deployment_location):
         """
@@ -32,40 +82,35 @@ class ResourceDriverHandler(Service, ResourceDriverHandlerCapability):
             ignition.service.resourcedriver.TemporaryResourceDriverError: there is an issue handling this request at this time
             ignition.service.resourcedriver.ResourceDriverError: there was an error handling this request
         """
-        netconf_location = None
-        
-        try:
-            netconf_location = NetConfDeploymentLocation.from_dict(deployment_location)
-            method_name = lifecycle_name.lower()
-            if(method_name == 'upgrade'):
-                method_name = 'update'
-            package_properties = jinja_conversion.from_pkg(resource_properties, driver_files, method_name)
-            if package_properties is None:
-                raise ResourceDriverError('Templating Exception')
-            default_operation = jinja_conversion.get_default_operation(resource_properties)
-            if method_name == 'delete':
-                default_operation = 'none'
-            if default_operation is None:
-                default_operation = 'merge'
-            rsa_key_path = jinja_conversion.to_rsa_path(resource_properties)
-            logger.debug('rsa_key_path : %s', rsa_key_path)
-            if rsa_key_path is None:
-                logger.warn("rsa_key_path is None!")
-            request_id = common.build_request_id(method_name)
-            logger.info('REQUEST: %s :- Before Executing Operation', request_id)
-            edit_config_details = netconf_location.operation(package_properties,default_operation,rsa_key_path,request_id)
-            logger.info('RESPONSE: %s :- After Executing Operation , Result : %s', request_id, edit_config_details)
-        except NetconfConfigError as e:
-            failure_reason = f'Error related to Netconf Connection or Configuration. {e}'
-            return LifecycleExecution(request_id, STATUS_FAILED, FailureDetails(FAILURE_CODE_INTERNAL_ERROR, failure_reason), outputs={})
-        except jinja_conversion.PropertyError as e:
-            failure_reason = f'Error related to jinja_conversion. {e}'
-            return LifecycleExecution(request_id, STATUS_FAILED, FailureDetails(FAILURE_CODE_INTERNAL_ERROR, failure_reason), outputs={})
-        else:
-            if (rsa_key_path != None):
-                os.unlink(rsa_key_path)
-            logger.info("Lifecycle Execution is successful.")
-            return LifecycleExecution(request_id, STATUS_COMPLETE, failure_details=None, outputs={})
+       
+        method_name = lifecycle_name.lower()
+        if(method_name == 'upgrade'):
+            method_name = 'update'
+        package_properties = jinja_conversion.from_pkg(resource_properties, driver_files, method_name)
+        if package_properties is None:
+            raise ResourceDriverError('Templating Exception')
+        default_operation = jinja_conversion.get_default_operation(resource_properties)
+        if method_name == 'delete':
+            default_operation = 'none'
+        if default_operation is None:
+            default_operation = 'merge'
+        rsa_key_path = jinja_conversion.to_rsa_path(resource_properties)
+        logger.debug('rsa_key_path : %s', rsa_key_path)
+        if rsa_key_path is None:
+            logger.warn("rsa_key_path is None!")
+        request_id = common.build_request_id(method_name)
+
+        my_job={
+                'job_type' : 'NetconfJob',
+                'request_id' : request_id,
+                'package_properties' : package_properties,
+                'default_operation' : default_operation,
+                'rsa_key_path' : rsa_key_path,
+                'deployment_location' : deployment_location}
+
+        self.job_queue.queue_job(my_job)
+        return LifecycleExecuteResponse(request_id)
+             
 
     def get_lifecycle_execution(self, request_id, deployment_location):
         """
