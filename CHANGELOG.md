@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.5.0](https://github.com/IBM/netconf-driver/tree/0.5.0) (2024-07-18)
+[Full Changelog](https://github.com/IBM/netconf-driver/compare/0.4.2...0.5.0)
+
+- UpdUpdate Ignition to 3.6.3 to fix the issue of request transfer-encoding with chunked format
+- Provide support for asynchronous communication using Ignition Job Queue.
+
 ## [0.4.2](https://github.com/IBM/netconf-driver/tree/0.4.2) (2024-06-18)
 [Full Changelog](https://github.com/IBM/netconf-driver/compare/0.4.1...0.4.2)
 
