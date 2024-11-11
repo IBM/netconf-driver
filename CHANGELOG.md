@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.5.1](https://github.com/IBM/netconf-driver/tree/0.5.1) (2024-11-11)
+[Full Changelog](https://github.com/IBM/netconf-driver/compare/0.5.0...0.5.1)
+
+- Rebuild to pick up security patches for CVE-2024-45490, CVE-2024-45491 and CVE-2024-45492
+
 ## [0.5.0](https://github.com/IBM/netconf-driver/tree/0.5.0) (2024-07-18)
 [Full Changelog](https://github.com/IBM/netconf-driver/compare/0.4.2...0.5.0)
 
